@@ -49,7 +49,7 @@ namespace Buckets
                 }
                 else
                 {
-                    _content = value;
+                    _content += value;
                     addedAmount = value;
                 }
 
