@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Buckets.CustomEventArgs;
+using System;
 using System.Dynamic;
 
 namespace Buckets
@@ -7,15 +8,22 @@ namespace Buckets
     {
         static void Main(string[] args)
         {
-            var bucket = new Bucket();
-            var bucket2 = new Bucket(19, 19);
+            var sut = new Bucket(20, 20);
+            var bucketToFill = new Bucket(0, 10);
+            bucketToFill.OverflowingEventHandler += OverflowingEvent;
 
-            DisplayContainerStats(bucket);
+            DisplayContainerStats(sut);
 
-            Console.WriteLine($"Filling {nameof(bucket)} with bucket2, 'Overflowed' event expected.");
-            bucket.Fill(bucket2);
+            bucketToFill.Fill(sut);
 
-            DisplayContainerStats(bucket);
+            DisplayContainerStats(sut);
+
+
+            void OverflowingEvent(object sender, OverflowingEventArgs e)
+            {
+                e.Response = OverflowingEventResponse.FillPartially;
+                e.AmountToBeAdded = 6;
+            }
 
             Console.ReadKey();
         }
@@ -26,23 +34,23 @@ namespace Buckets
             Console.WriteLine($"Maximum capacity: {container.Capacity}, Current contents: {container.Content}");
         }
 
-        static void ContainerFull(object sender, ContentEventArgs e)
+        static void ContainerFull(object sender, FullEventArgs e)
         {
-            Console.WriteLine($"{e.Message}");
+            Console.WriteLine($"Full event published.");
         }
 
-        static void ContainerOverflowed(object sender, ContentEventArgs e)
+        static void ContainerOverflowed(object sender, OverflowedEventArgs e)
         {
-            Console.WriteLine($"{e.Message} Amount spilled: {e.SpilledAmount}.");
+            Console.WriteLine($"Overflowed event published. Amount spilled: {e.SpilledAmount}.");
         }
 
-        static void ContainerOverflowing(object sender, ContentEventArgs e)
+        static void ContainerOverflowing(object sender, OverflowingEventArgs e)
         {
             var cont = sender as Container;
 
             if (cont != null)
             {
-                Console.WriteLine($"{e.Message} Amount that will be spilled: {e.SpilledAmount}. Please don't add more than {cont.Capacity - cont.Content}.");
+                Console.WriteLine($"Overflowing event published.");
             }
         }
     }

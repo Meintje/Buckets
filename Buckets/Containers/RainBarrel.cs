@@ -18,11 +18,11 @@ namespace Buckets
 
         public RainBarrel(int content, int capacity)
         {
-            Capacity = SelectBarrelCapacity(capacity);
+            Capacity = SelectRainBarrelCapacity(capacity);
             Content = content;
         }
 
-        private int SelectBarrelCapacity(int desiredCapacity)
+        private int SelectRainBarrelCapacity(int desiredCapacity)
         {
             if (desiredCapacity <= 80)
             {
