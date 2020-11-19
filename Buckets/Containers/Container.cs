@@ -19,7 +19,7 @@ namespace Buckets
             {
                 if (value < 0) { throw new NegativeAmountException("A container cannot be filled with a negative amount."); }
 
-                int amountThatWillBeSpilled = (value + _content) - Capacity;
+                int amountThatWillBeSpilled = value - Capacity;
 
                 if (amountThatWillBeSpilled > 0)
                 {
@@ -49,7 +49,7 @@ namespace Buckets
                 }
                 else
                 {
-                    _content += value;
+                    _content = value;
                     addedAmount = value;
                 }
 
@@ -83,13 +83,13 @@ namespace Buckets
         {
             if (amount < 0) { throw new NegativeAmountException("A container cannot be emptied with a negative amount."); }
 
-            if ((_content - amount) < 0)
+            if ((Content - amount) < 0)
             {
-                _content = 0;
+                Content = 0;
             }
             else
             {
-                _content -= amount;
+                Content -= amount;
             }
         }
 
