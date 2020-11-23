@@ -39,7 +39,7 @@ namespace Buckets
             if (this == bucket) { throw new SameBucketException("It is not possible to fill a bucket with itself."); }
             else
             {
-                this.Content += bucket.Content;
+                base.Fill(bucket.Content);
 
                 // Empty the bucket that was used to fill this one with the amount that was transferred.
                 bucket.Empty(addedAmount);

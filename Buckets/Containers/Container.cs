@@ -17,46 +17,7 @@ namespace Buckets
             get { return _content; } 
             set
             {
-                if (value < 0) { throw new NegativeAmountException("A container cannot be filled with a negative amount."); }
-
-                int amountThatWillBeSpilled = value - Capacity;
-
-                if (amountThatWillBeSpilled > 0)
-                {
-                    int amountThatCanBeAdded = Capacity - _content;
-
-                    var overflowingEventArguments = Overflowing(new OverflowingEventArgs(amountThatWillBeSpilled, amountThatCanBeAdded));
-
-                    switch (overflowingEventArguments.Response)
-                    {
-                        case OverflowingEventResponse.Cancel:
-                            addedAmount = 0;
-                            break;
-                        case OverflowingEventResponse.IgnoreOverflow:
-                            addedAmount = value;
-                            _content = Capacity;
-                            Overflowed(new OverflowedEventArgs(amountThatWillBeSpilled));
-                            break;
-                        case OverflowingEventResponse.FillToBrim:
-                            addedAmount = amountThatCanBeAdded;
-                            _content = Capacity;
-                            break;
-                        case OverflowingEventResponse.FillPartially:
-                            addedAmount = overflowingEventArguments.AmountToBeAdded;
-                            _content += overflowingEventArguments.AmountToBeAdded;
-                            break;
-                    }
-                }
-                else
-                {
-                    _content = value;
-                    addedAmount = value;
-                }
-
-                if (_content == Capacity)
-                {
-                    Full(new FullEventArgs());
-                }
+                ValidateAndSetContent(value, 0);
             }
         }
 
@@ -71,7 +32,52 @@ namespace Buckets
 
         public void Fill(int amount)
         {
-            Content += amount;
+            ValidateAndSetContent(amount, _content);
+        }
+
+        // TODO: Think of a more descriptive name for baseContent
+        protected void ValidateAndSetContent(int amount, int baseContent)
+        {
+            if (amount < 0) { throw new NegativeAmountException("A container cannot be filled with a negative amount."); }
+
+            int amountThatWillBeSpilled = (baseContent + amount) - Capacity;
+
+            if (amountThatWillBeSpilled > 0)
+            {
+                int amountThatCanBeAdded = Capacity - baseContent;
+
+                var overflowingEventArguments = Overflowing(new OverflowingEventArgs(amountThatWillBeSpilled, amountThatCanBeAdded));
+
+                switch (overflowingEventArguments.Response)
+                {
+                    case OverflowingEventResponse.Cancel:
+                        addedAmount = 0;
+                        break;
+                    case OverflowingEventResponse.IgnoreOverflow:
+                        addedAmount = amount;
+                        _content = Capacity;
+                        Overflowed(new OverflowedEventArgs(amountThatWillBeSpilled));
+                        break;
+                    case OverflowingEventResponse.FillToBrim:
+                        addedAmount = amountThatCanBeAdded;
+                        _content = Capacity;
+                        break;
+                    case OverflowingEventResponse.FillPartially:
+                        addedAmount = overflowingEventArguments.AmountToBeAdded;
+                        _content = baseContent + overflowingEventArguments.AmountToBeAdded;
+                        break;
+                }
+            }
+            else
+            {
+                _content = baseContent + amount;
+                addedAmount = amount;
+            }
+
+            if (_content == Capacity)
+            {
+                Full(new FullEventArgs());
+            }
         }
 
         public void Empty()

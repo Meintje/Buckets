@@ -9,6 +9,7 @@ namespace Buckets.Test
 {
     public class BucketShould
     {
+        #region Constructor
         [Fact]
         public void HaveDefaultCapacityOfTwelve()
         {
@@ -52,7 +53,15 @@ namespace Buckets.Test
 
             Assert.Equal(minimumCapacity, sut.Capacity);
         }
+        #endregion
 
+        #region Content setter
+        #endregion
+
+        #region Fill method
+        #endregion
+
+        #region Events
         [Fact]
         public void PublishFullEvent()
         {
@@ -146,6 +155,54 @@ namespace Buckets.Test
                 e.Response = OverflowingEventResponse.FillToBrim;
             }
         }
+        #endregion
+
+        #region Exceptions
+        [Fact]
+        public void ThrowNegativeAmountExceptionWhenFilledWithNegativeAmount()
+        {
+            var sut = new Bucket();
+
+            Assert.Throws<NegativeAmountException>(() => sut.Fill(-1));
+        }
+
+        [Fact]
+        public void ThrowNegativeAmountExceptionWhenEmptiedWithNegativeAmount()
+        {
+            var sut = new Bucket();
+
+            Assert.Throws<NegativeAmountException>(() => sut.Empty(-1));
+        }
+
+        [Fact]
+        public void ThrowNegativeAmountExceptionWhenCreatedWithNegativeContent()
+        {
+            Bucket sut;
+
+            Assert.Throws<NegativeAmountException>(() => sut = new Bucket(-1));
+        }
+
+        [Fact]
+        public void ThrowSameBucketExceptionWhenFilledWithItself()
+        {
+            var sut = new Bucket(6);
+
+            Assert.Throws<SameBucketException>(() => sut.Fill(sut));
+        }
+        #endregion
+
+        #region Filling a Bucket with a Bucket
+        [Fact]
+        public void BeFillableWithOtherBucket()
+        {
+            var sut = new Bucket();
+            int expectedContent = 6;
+            var otherBucket = new Bucket(expectedContent);
+
+            sut.Fill(otherBucket);
+
+            Assert.Equal(expectedContent, sut.Content);
+        }
 
         [Fact]
         public void BeEmptyWhenUsedToFillOtherBucket()
@@ -213,49 +270,6 @@ namespace Buckets.Test
                 e.Response = OverflowingEventResponse.Cancel;
             }
         }
-
-        [Fact]
-        public void ThrowNegativeAmountExceptionWhenFilledWithNegativeAmount()
-        {
-            var sut = new Bucket();
-
-            Assert.Throws<NegativeAmountException>(() => sut.Fill(-1));
-        }
-
-        [Fact]
-        public void ThrowNegativeAmountExceptionWhenEmptiedWithNegativeAmount()
-        {
-            var sut = new Bucket();
-
-            Assert.Throws<NegativeAmountException>(() => sut.Empty(-1));
-        }
-
-        [Fact]
-        public void ThrowNegativeAmountExceptionWhenCreatedWithNegativeContent()
-        {
-            Bucket sut;
-
-            Assert.Throws<NegativeAmountException>(() => sut = new Bucket(-1));
-        }
-
-        [Fact]
-        public void ThrowSameBucketExceptionWhenFilledWithItself()
-        {
-            var sut = new Bucket(6);
-
-            Assert.Throws<SameBucketException>(() => sut.Fill(sut));
-        }
-
-        [Fact]
-        public void BeFillableWithOtherBucket()
-        {
-            var sut = new Bucket();
-            int expectedContent = 6;
-            var otherBucket = new Bucket(expectedContent);
-
-            sut.Fill(otherBucket);
-
-            Assert.Equal(expectedContent, sut.Content);
-        }
+        #endregion
     }
 }
